@@ -6,11 +6,23 @@ html,body{
 #playground {
     background: white;
     width: 500px;
-    height: 500px;
+    height: 600px;
     position: absolute;
     top: 50%;
-    margin-top: -250px; /* negative half of the height */
+    margin-top: -375px; /* negative half of the height */
     left: 50%;
     margin-left: -250px;
     border: 1px solid #eaeaea;
+}
+
+
+#gameMap {
+    border-collapse: separate;
+    border-spacing: 5px 5px;
+}
+
+#gameMap td{
+    width: 50px;
+    height: 50px;
+    border: 1px solid #000;
 }
