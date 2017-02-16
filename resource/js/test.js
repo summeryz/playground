@@ -10,23 +10,22 @@ jQuery(window).ready(function () {
     Init._setTileCategories(5);
     Init.TEST_initEmptyMap();
 
-    console_test(Init._tileCategories);
+    console_test(Main._tileCategories);
 });
-
 
 
 
 
 //创建为空的地图（map entity）
 Init.TEST_initEmptyMap = function () {
-    this.mapEntity = new Array();
+    Main.mapEntity = new Array();
 
-    for (var i = 0; i < this.mapHeight; i++) {
-        this.mapEntity[i] = new Array();
-        for (var j = 0; j < this.mapWidth; j++) {
-            this.mapEntity[i][j] = Init.generateRandomTile();
+    for (var i = 0; i < Main.mapHeight; i++) {
+        Main.mapEntity[i] = new Array();
+        for (var j = 0; j < Main.mapWidth; j++) {
+            Main.mapEntity[i][j] = Main.generateRandomTile();
         }
     }
 // console_test(this.mapEntity)
-    Init._refreshMapDisplay(this.mapEntity);
+    Main._refreshMapDisplay(Main.mapEntity);
 }
