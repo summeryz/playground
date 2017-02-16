@@ -33,6 +33,9 @@ Main.mapWidth = 10;
 Main.mapHeight = 10;
 Main.mapEntity = null;
 
+Main.originTile = null;
+Main.targetTile = null;
+
 
 
 
@@ -51,12 +54,55 @@ Main._refreshMapDisplay = function (obj) {
             if (obj[i][j] != null) {
                 className = obj[i][j].name;
             }
-            htmlStr += "<td class='"+className+"'></td>";
+            htmlStr += "<td><div class='"+className+"'></div></td>";
         }
         htmlStr += "</tr>";
     }
 
     jQuery("#gameMap").html(htmlStr);
+
+    Main._bindDragAndDrop();
+}
+
+Main._bindDragAndDrop = function () {
+
+    jQuery("#gameMap td").each(function () {
+        var col = jQuery(this).parent().children().index(jQuery(this));
+        var row = jQuery(this).parent().parent().children().index(jQuery(this).parent());
+
+        jQuery(this).draggable({
+            cursor: "pointer",
+            cursorAt: {top: 25, left: 25},
+            // snap: true,
+            // snapTolerance: 30,
+            opacity: 0.75,
+            zIndex: 999,
+            revert: true,
+            revertDuration: 50,
+            snapTolerance: 30,
+            start: function (event, ui) {
+                Main.originTile = {"col": col, "row": row};
+                console_test(Main.originTile);
+            },
+            drag: function(event, ui) {
+                //constraint tiles
+                ui.position.top = Math.min( 54, ui.position.top);
+                ui.position.top = Math.max( -54, ui.position.top);
+                ui.position.left = Math.min( 54, ui.position.left);
+                ui.position.left = Math.max( -54, ui.position.left);
+
+            },
+            stop: function (event, ui) {
+
+            }
+        });
+
+
+    });
+
+
+
+
 }
 
 Main.generateRandomTile = function () {
