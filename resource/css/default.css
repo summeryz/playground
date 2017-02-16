@@ -1,0 +1,16 @@
+html,body{
+    margin: 0;
+    background: #eeeeee;
+}
+
+#playground {
+    background: white;
+    width: 500px;
+    height: 500px;
+    position: absolute;
+    top: 50%;
+    margin-top: -250px; /* negative half of the height */
+    left: 50%;
+    margin-left: -250px;
+    border: 1px solid #eaeaea;
+}
