@@ -4,12 +4,12 @@ html,body{
 }
 
 #playground {
-    background: white;
+    /*background: white;*/
     width: 500px;
-    height: 600px;
+    height: 700px;
     position: absolute;
     top: 50%;
-    margin-top: -375px; /* negative half of the height */
+    margin-top: -350px; /* negative half of the height */
     left: 50%;
     margin-left: -250px;
     border: 1px solid #eaeaea;
@@ -18,11 +18,42 @@ html,body{
 
 #gameMap {
     border-collapse: separate;
-    border-spacing: 5px 5px;
+    border-spacing: 0px 0px;
+    border-right: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+    background: #fff;
 }
 
+
+/* start tile */
 #gameMap td{
     width: 50px;
     height: 50px;
-    border: 1px solid #000;
+    border-left: 1px solid #aaa;
+    border-top: 1px solid #aaa;
+    background-size:  32px 32px;
+    background-position: 9px 9px;
+    background-repeat: no-repeat;
 }
+
+#gameMap td.null {
+    background: #000000;
+}
+
+#gameMap td.box {
+    background-image: url("../img/box.png");
+}
+#gameMap td.circling {
+    background-image: url("../img/circling.png");
+}
+#gameMap td.round {
+    background-image: url("../img/round.png");
+}
+#gameMap td.screen {
+    background-image: url("../img/screen.png");
+}
+#gameMap td.song {
+    background-image: url("../img/song.png");
+}
+
+/* end tile */

@@ -5,13 +5,13 @@ jQuery.noConflict();
 
 var Init = Init || {}
 
-jQuery(window).ready(function () {
-    Init._setMapSize(6, 10);
-    Init._setTileCategories(3);
-    Init._initEmptyMap();
-
-    console_test(Init._tileCategories);
-});
+// jQuery(window).ready(function () {
+//     Init._setMapSize(6, 10);
+//     Init._setTileCategories(3);
+//     Init._initEmptyMap();
+//
+//     console_test(Init._tileCategories);
+// });
 
 Init._defauleTileCategories = [{
         name: "box",
@@ -83,13 +83,11 @@ Init._refreshMapDisplay = function (obj) {
     for (var i = 0; i < obj.length; i++) {
         htmlStr += "<tr>";
         for (var j = 0; j < obj[i].length; j++) {
-            htmlStr += "<td>";
-            if (obj[i][j] == null) {
-                htmlStr += "233";
-            } else {
-
+            var className = "box";
+            if (obj[i][j] != null) {
+                className = obj[i][j].name;
             }
-            htmlStr += "</td>";
+            htmlStr += "<td class='"+className+"'></td>";
         }
         htmlStr += "</tr>";
     }
@@ -100,5 +98,6 @@ Init._refreshMapDisplay = function (obj) {
 Init.generateRandomTile = function () {
     var tiles = this._tileCategories;
     var index = Math.floor(Math.random() * tiles.length);
-    console_test(tiles[index]);
+
+    return tiles[index];
 }
