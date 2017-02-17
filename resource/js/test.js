@@ -6,8 +6,8 @@ console_test = function (obj) {
 }
 
 jQuery(window).ready(function () {
-    Init._setMapSize(6, 10);
-    Init._setTileCategories(5);
+    Init.setMapSize(6, 10);
+    Init.setTileCategories(5);
     Init.TEST_initEmptyMap();
 
     console_test(Main._tileCategories);
@@ -18,14 +18,17 @@ jQuery(window).ready(function () {
 
 //创建为空的地图（map entity）
 Init.TEST_initEmptyMap = function () {
-    Main.mapEntity = new Array();
+    Main.tileMap = new Array();
 
     for (var i = 0; i < Main.mapHeight; i++) {
-        Main.mapEntity[i] = new Array();
+        Main.tileMap[i] = new Array();
         for (var j = 0; j < Main.mapWidth; j++) {
-            Main.mapEntity[i][j] = Main.generateRandomTile();
+            Main.tileMap[i][j] = Main.generateRandomTile();
         }
     }
 // console_test(this.mapEntity)
-    Main._refreshMapDisplay(Main.mapEntity);
+//     Main._refreshMapDisplay(Main.tileMap);
+    console_test(Main.tileMap);
+    Main._buildEmptyMapDisplay();
 }
+
