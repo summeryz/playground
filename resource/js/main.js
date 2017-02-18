@@ -272,13 +272,9 @@ Main._swapTile = function (origin, target) {
 Main._eliminated = function (row, col) {
     // console_test([row, col]);
     var matched = Main._tileMatching(row, col);
-    console_test(matched);
+    // console_test(matched);
 
     Main.highlightMatched(matched);
-
-
-
-    Test.displayTileStatus();
 
     return matched.result;
 }
@@ -389,7 +385,7 @@ Main.calcMoveDown = function() {
     for (var i = 0; i < Main.removableTiles.length; i++) {
         //drop down tiles over this tile
         var temp = Main.removableTiles[i];
-        console_test(temp);
+        // console_test(temp);
         for (var j = 0; j < temp[0]; j++) {
             Main.tileMap[j][temp[1]].moveDown++;
         }
@@ -403,6 +399,10 @@ Main.calcMoveDown = function() {
 Main.processMoveDown = function() {
     for (var row = Main.mapHeight - 1; row >=0; row--) {
         for (var col = Main.mapWidth - 1; col >= 0; col--) {
+            if (Main.tileMap[row][col].removable) {
+                Main.tileMap[row][col] = Main.generateEmptyTile();
+            }
+
             if (!Main.tileMap[row][col].removable && Main.tileMap[row][col].moveDown != 0) {
                 var downStep = Main.tileMap[row][col].moveDown;
                 Main.tileMap[row + downStep][col] = Main.tileMap[row][col];
@@ -415,7 +415,13 @@ Main.processMoveDown = function() {
 }
 
 Main.fillEmptyTiles = function() {
-
+    for (var row = Main.mapHeight - 1; row >=0; row--) {
+        for (var col = Main.mapWidth - 1; col >= 0; col--) {
+            if (Main.tileMap[row][col].name == "empty") {
+                Main.tileMap[row][col] = Init.randomTileGenerator();
+            }
+        }
+    }
 }
 
 Main.generateEmptyTile = function() {
@@ -461,17 +467,34 @@ Main.resetRemovableTiles = function () {
 }
 
 Main.fadeOutMatched = function () {
-    var refreshed = false;
+    var finished = false;
+    var tileCount = jQuery(".highlighted").size();
 
     jQuery(".highlighted").each(function() {
         var _self = this;
-        jQuery(_self).children("div:first").fadeOut(5000, function() {
+        jQuery(_self).children("div:first").fadeOut("slow", function() {
             jQuery(_self).removeClass("highlighted");
-            if (!refreshed) {
-                Main.refreshMapDisplay(Main.tileMap);
-                refreshed = true;
-            }
+            finished = true;
         });
     });
 
+    setTimeout(function () {
+        Main.refreshMapDisplay(Main.tileMap);
+        Main.startNewCycle(tileCount);
+    }, 1000);
+
+}
+
+Main.startNewCycle = function () {
+    Main.autoMatch();
+}
+
+Main.autoMatch = function() {
+    for (var row = Main.mapHeight - 1; row >=0; row--) {
+        for (var col = Main.mapWidth - 1; col >= 0; col--) {
+            // if (Main.tileMap[row][col].name == "empty") {
+            //     Main.tileMap[row][col] = Init.randomTileGenerator();
+            // }
+        }
+    }
 }
