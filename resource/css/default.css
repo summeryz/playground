@@ -31,9 +31,6 @@ html,body{
     border: 1px solid #aaa;
 }
 
-#gameMap .highlighted{
-    background-color: aqua;
-}
 
 #gameMap div {
     width: 100%;

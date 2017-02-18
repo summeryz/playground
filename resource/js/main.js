@@ -358,7 +358,7 @@ Main.highlightMatched = function (matched) {
     }
 }
 
-Main.processElimination = function (matched) {
+Main.processElimination = function () {
     //update Main.removableTiles and process bonus, if need
     if (Main.removableTiles == null) {
         return;
@@ -459,10 +459,12 @@ Main.addRemovableTiles = function(row, col) {
         Main.removableTiles.push([row, col]);
         //set this tile removable
         Main.tileMap[row][col].removable = true;
+        // console_test([row, col]);
     }
 }
 
 Main.resetRemovableTiles = function () {
+    console_test("clear  Main.removableTiles");
     Main.removableTiles = null;
 }
 
@@ -472,29 +474,55 @@ Main.fadeOutMatched = function () {
 
     jQuery(".highlighted").each(function() {
         var _self = this;
-        jQuery(_self).children("div:first").fadeOut("slow", function() {
-            jQuery(_self).removeClass("highlighted");
-            finished = true;
+        jQuery(_self).removeClass("highlighted");
+        jQuery(_self).children("div:first").css({'background-color':'red'});
+        jQuery(_self).children("div:first").fadeOut(2000, function() {
+            if (!finished) {
+                finished = true;
+
+
+                Main.refreshMapDisplay(Main.tileMap);
+
+                Main.startNewCycle(tileCount);
+            }
+
         });
+
+
     });
 
+}
+
+// Main.fadeOutMatched = function () {
+//     var finished = false;
+//     var tileCount = jQuery(".highlighted").size();
+//
+//     jQuery(".highlighted").each(function() {
+//         var _self = this;
+//         jQuery(_self).removeClass("highlighted");
+//     });
+//     Main.refreshMapDisplay(Main.tileMap);
+//
+//     Main.startNewCycle(tileCount);
+// }
+
+Main.startNewCycle = function () {
+    Main.autoMatch();
+
+    Main.processElimination();
+
     setTimeout(function () {
-        Main.refreshMapDisplay(Main.tileMap);
-        Main.startNewCycle(tileCount);
+        Main.fadeOutMatched();
     }, 1000);
 
 }
 
-Main.startNewCycle = function () {
-    Main.autoMatch();
-}
-
 Main.autoMatch = function() {
+    Main.resetRemovableTiles();
+
     for (var row = Main.mapHeight - 1; row >=0; row--) {
         for (var col = Main.mapWidth - 1; col >= 0; col--) {
-            // if (Main.tileMap[row][col].name == "empty") {
-            //     Main.tileMap[row][col] = Init.randomTileGenerator();
-            // }
+            Main._eliminated(row, col);
         }
     }
 }
