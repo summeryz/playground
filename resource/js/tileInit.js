@@ -37,7 +37,10 @@ Init._initEmptyMap = function () {
     for (var i = 0; i < Main.mapHeight; i++) {
         Main.tileMap[i] = new Array();
         for (var j = 0; j < Main.mapWidth; j++) {
-            Main.tileMap[i][j] = null;
+            Main.tileMap[i][j] = {
+                    name: "empty",
+                    icon: "empty"
+                };
         }
     }
 
@@ -45,3 +48,7 @@ Init._initEmptyMap = function () {
     Main._buildEmptyMapDisplay();
 }
 
+//
+Init.initTileGenerator = function () {
+    
+}

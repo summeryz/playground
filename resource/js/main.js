@@ -25,7 +25,12 @@ Main._defauleTileCategories = [{
     {
         name: "song",
         icon: "song.png"
-    }];
+    },
+    // {//empty block example
+    //     name: "empty",
+    //     icon: "empty"
+    // }
+    ];
 
 Main._draggableConfig = {
     cursor: "pointer",
@@ -103,10 +108,15 @@ Main._convertTileObjToDiv = function (tileObj) {
         return null;
     }
 
-    return jQuery('<div/>', {
-        "class": tileObj.name + " draggable",
-
-    }).attr("tile-type", tileObj.name).draggable(Main._draggableConfig);
+    if (tileObj.name != "empty") {
+        return jQuery('<div/>', {
+            "class": tileObj.name + " draggable",
+        }).attr("tile-type", tileObj.name).draggable(Main._draggableConfig);
+    } else {
+        return jQuery('<div/>', {
+            "class": tileObj.name + " draggable",
+        }).attr("tile-type", tileObj.name);
+    }
 }
 
 
@@ -162,6 +172,11 @@ Main.validateTileSwap = function() {
     var originTile = jQuery("#" + Main.originTileId + " div");
     var targetTile = jQuery("#" + Main.targetTileId + " div");
 
+    //if have empty tile
+    if (originTile.attr("tile-type") == "empty" || targetTile.attr("tile-type") == "empty") {
+        return false;
+    }
+
     //if same tile-type
     if (originTile.attr("tile-type") == targetTile.attr("tile-type") ) {
         return false;
@@ -187,31 +202,6 @@ Main.validateTileSwap = function() {
     return true;
 }
 
-// Main._swapEliminable = function(originTileId, targetTileId) {
-//     // return true;
-//     var originDiv= jQuery("#" + originTileId + " div");
-//     var targetDiv = jQuery("#" + targetTileId + " div").attr("tile-type");
-//
-//     var originObj = Main.decomposeTdId(originTileId);
-//     var targetObj = Main.decomposeTdId(targetTileId);
-//
-//     originObj.type = targetDiv.attr("tile-type");
-//     targetObj.type = originType;
-//
-//     console_test(originObj);
-//     console_test(targetObj);
-//
-//     // Main._swapTileEntity(origin, target);
-//     // Main._swapTileEntity(origin, target);
-//
-//     if (Main._eliminable(originObj) || Main._eliminable(targetObj)) {
-//         console_test("swappable");
-//         return true;
-//     }
-//
-//     console_test("cannot swap");
-//     return false;
-// }
 
 Main._swapEliminable = function(originTileId, targetTileId) {
     var result = false;
@@ -279,7 +269,7 @@ Main._swapTile = function (origin, target) {
 Main._eliminable = function (row, col) {
     // console_test([row, col]);
     var matched = Main._tileMatching(row, col);
-    // console_test(matched);
+    console_test(matched);
     Main.highlightMatched(matched);
 
     return matched.result;
@@ -305,6 +295,10 @@ Main._tileMatching = function (row, col) {
     var right = col;
     var bottom = row;
     var left = col;
+
+    if (type == "empty") {
+        return {result: result, top:top, right:right, bottom:bottom, left:left, originRow: row, originCol: col};;
+    }
 
     //top
     while (top > 0 && Main._getTileTypeByPos(top - 1, col) == type) {

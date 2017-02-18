@@ -45,7 +45,7 @@ html,body{
     text-align: center;
 }
 
-#gameMap div.null {
+#gameMap div.empty {
     background: #000000;
 }
 
