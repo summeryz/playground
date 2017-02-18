@@ -187,25 +187,50 @@ Main.validateTileSwap = function() {
     return true;
 }
 
+// Main._swapEliminable = function(originTileId, targetTileId) {
+//     // return true;
+//     var originDiv= jQuery("#" + originTileId + " div");
+//     var targetDiv = jQuery("#" + targetTileId + " div").attr("tile-type");
+//
+//     var originObj = Main.decomposeTdId(originTileId);
+//     var targetObj = Main.decomposeTdId(targetTileId);
+//
+//     originObj.type = targetDiv.attr("tile-type");
+//     targetObj.type = originType;
+//
+//     console_test(originObj);
+//     console_test(targetObj);
+//
+//     // Main._swapTileEntity(origin, target);
+//     // Main._swapTileEntity(origin, target);
+//
+//     if (Main._eliminable(originObj) || Main._eliminable(targetObj)) {
+//         console_test("swappable");
+//         return true;
+//     }
+//
+//     console_test("cannot swap");
+//     return false;
+// }
+
 Main._swapEliminable = function(originTileId, targetTileId) {
-    var originObj = Main.decomposeTdId(originTileId);
-    var targetObj = Main.decomposeTdId(targetTileId);
-    var originType = jQuery("#" + originTileId + " div").attr("tile-type");
-    var targetType = jQuery("#" + targetTileId + " div").attr("tile-type");
+    var result = false;
 
-    originObj.type = targetType;
-    targetObj.type = originType;
+    var originObj= jQuery("#" + originTileId + " div");
+    var targetObj = jQuery("#" + targetTileId + " div");
 
-    console_test(originObj);
-    console_test(targetObj);
+    var originPos = Main.decomposeTdId(originTileId);
+    var targetPos = Main.decomposeTdId(targetTileId);
 
-    if (Main._eliminable(originObj) || Main._eliminable(targetObj)) {
-        console_test("swappable");
-        return true;
+    Main._swapTileEntity(originObj, targetObj);
+
+    if (Main._eliminable(targetPos.row, targetPos.col) || Main._eliminable(originPos.row, originPos.col)) {
+        result = true;
     }
 
-    console_test("cannot swap");
-    return false;
+    Main._swapTileEntity(originObj, targetObj);
+
+    return result;
 }
 
 
@@ -250,9 +275,9 @@ Main._swapTile = function (origin, target) {
  * @returns {boolean}
  * @private
  */
-Main._eliminable = function (tileObj) {
-    console_test(tileObj);
-    var matched = Main._tileMatching(tileObj);
+Main._eliminable = function (row, col) {
+    // console_test([row, col]);
+    var matched = Main._tileMatching(row, col);
     // console_test(matched);
     Main.highlightMatched(matched);
 
@@ -271,11 +296,8 @@ Main._getTileTypeByPos = function(row, col) {
 }
 
 //基于一个前提，如果是十字消失，拖动的那个tile一定是中轴
-Main._tileMatching = function (tileObj) {
-    // console_test(tileObj);
-    var row = tileObj.row;
-    var col = tileObj.col;
-    var type = tileObj.type;
+Main._tileMatching = function (row, col) {
+    var type = Main._getTileTypeByPos(row, col);
 
     var result = false;
     var top = row;

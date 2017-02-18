@@ -44,12 +44,18 @@ Test.displayElimination = function() {
         var _self = this;
         //start test Main._eliminable
         jQuery(_self).on('click', function() {
+            //only for test
             var type = jQuery(_self).children("div:first").attr("tile-type");
             var tdId = jQuery(_self).attr("id");
             var obj = Main.decomposeTdId(tdId);
             obj.type = type;
+            obj.entityType = Main._getTileTypeByPos(obj.row, obj.col);
+            console_test(obj);
+            //only for test
 
-            Main._eliminable(obj);
+
+
+            Main._eliminable(obj.row, obj.col);
         });
     });
 }
