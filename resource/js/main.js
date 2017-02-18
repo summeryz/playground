@@ -58,6 +58,8 @@ Main._draggableConfig = {
     }
 }
 
+Main.score = 0;
+
 Main._tileCategories = Main._defauleTileCategories;
 Main.mapWidth = 10;
 Main.mapHeight = 10;
@@ -104,6 +106,8 @@ Main.refreshMapDisplay = function(obj) {
     }
 
     Main.resetTileStatus();
+
+    jQuery("#score").html(Main.score);
 }
 
 Main._convertTileObjToDiv = function (tileObj) {
@@ -464,7 +468,10 @@ Main.addRemovableTiles = function(row, col) {
 }
 
 Main.resetRemovableTiles = function () {
-    console_test("clear  Main.removableTiles");
+    if (Main.removableTiles != null) {
+        Main.score += 10 * Main.removableTiles.length;
+    }
+
     Main.removableTiles = null;
 }
 
