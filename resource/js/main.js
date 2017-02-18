@@ -465,7 +465,7 @@ Main.fadeOutMatched = function () {
 
     jQuery(".highlighted").each(function() {
         var _self = this;
-        jQuery(_self).children("div:first").fadeOut(2000, function() {
+        jQuery(_self).children("div:first").fadeOut(5000, function() {
             jQuery(_self).removeClass("highlighted");
             if (!refreshed) {
                 Main.refreshMapDisplay(Main.tileMap);

@@ -12,8 +12,8 @@ console_test = function (obj) {
 }
 
 jQuery(window).ready(function () {
-    Init.setMapSize(10, 15);
-    Init.setTileCategories(3);
+    Init.setMapSize(6, 10);
+    Init.setTileCategories(2);
 
     // Init.TEST_initEmptyMap();
 

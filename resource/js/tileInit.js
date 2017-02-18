@@ -59,7 +59,7 @@ Init.initStartMap = function() {
 
 //
 Init.initTileGenerator = function (row, col) {
-    var test = 200;
+    var test = 500;
 
     while (Main.tileMap[row][col].name == "empty") {
         if (test-- < 0) {
