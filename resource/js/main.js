@@ -69,7 +69,8 @@ Main.removableTiles = null;
 Main.originTileId = null;
 Main.targetTileId = null;
 
-
+Main.fadeInterval = 200;
+Main.refillInterval = 200;
 
 
 
@@ -483,7 +484,7 @@ Main.fadeOutMatched = function () {
         var _self = this;
         jQuery(_self).removeClass("highlighted");
         jQuery(_self).children("div:first").css({'background-color':'red'});
-        jQuery(_self).children("div:first").fadeOut(2000, function() {
+        jQuery(_self).children("div:first").fadeOut(Main.fadeInterval, function() {
             if (!finished) {
                 finished = true;
 
@@ -520,7 +521,7 @@ Main.startNewCycle = function () {
 
     setTimeout(function () {
         Main.fadeOutMatched();
-    }, 1000);
+    }, Main.refillInterval);
 
 }
 

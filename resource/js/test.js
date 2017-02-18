@@ -12,6 +12,9 @@ console_test = function (obj) {
 }
 
 jQuery(window).ready(function () {
+    // Main.fadeInterval = 2000;
+    // Main.refillInterval = 1000;
+
     Init.setMapSize(6, 10);
     Init.setTileCategories(5);
 
