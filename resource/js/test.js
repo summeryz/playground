@@ -55,6 +55,7 @@ Test.displayElimination = function() {
 
 
 
+
             Main._eliminable(obj.row, obj.col);
         });
     });

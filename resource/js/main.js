@@ -226,6 +226,7 @@ Main._swapEliminable = function(originTileId, targetTileId) {
 
     if (Main._eliminable(targetPos.row, targetPos.col) || Main._eliminable(originPos.row, originPos.col)) {
         result = true;
+        Main._eliminable(originPos.row, originPos.col);//两个都可以的时候防止highlight被短路
     }
 
     Main._swapTileEntity(originObj, targetObj);
