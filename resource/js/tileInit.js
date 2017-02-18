@@ -48,7 +48,41 @@ Init._initEmptyMap = function () {
     Main._buildEmptyMapDisplay();
 }
 
+Init.initStartMap = function() {
+    Init._initEmptyMap();
+
+    for (var row = Main.mapHeight - 1; row >= 0; row--) {
+        for(var col = Main.mapWidth - 1; col >= 0; col--) {
+            Init.initTileGenerator(row, col);
+        }
+    }
+
+    Main._buildEmptyMapDisplay();
+}
+
 //
-Init.initTileGenerator = function () {
-    
+Init.initTileGenerator = function (row, col) {
+    var test = 100;
+
+    while (Main.tileMap[row][col].name == "empty") {
+        if (test-- < 0) {
+            throw "dead loop in tile generator";
+        }
+
+        Main.tileMap[row][col] = Init.randomTileGenerator();
+
+        //初始不能有 已经可消除的块
+        if (Main._tileMatching(row, col).result) {
+            console_test([row, col]);
+            console_test(Main.tileMap[row][col]);
+            Main.clearTileEntity(row, col);
+        }
+    }
+}
+
+Init.randomTileGenerator = function () {
+    var tiles = Main._tileCategories;
+    var index = Math.floor(Math.random() * tiles.length);
+
+    return tiles[index];
 }

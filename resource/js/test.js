@@ -13,7 +13,10 @@ console_test = function (obj) {
 jQuery(window).ready(function () {
     Init.setMapSize(6, 10);
     Init.setTileCategories(5);
-    Init.TEST_initEmptyMap();
+
+    // Init.TEST_initEmptyMap();
+
+    Init.initStartMap();
 
     console_test(Main._tileCategories);
     Test.displayElimination();
@@ -29,7 +32,7 @@ Init.TEST_initEmptyMap = function () {
     for (var i = 0; i < Main.mapHeight; i++) {
         Main.tileMap[i] = new Array();
         for (var j = 0; j < Main.mapWidth; j++) {
-            Main.tileMap[i][j] = Main.generateRandomTile();
+            Main.tileMap[i][j] = Init.randomTileGenerator();
         }
     }
 // console_test(this.mapEntity)

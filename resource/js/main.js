@@ -150,12 +150,7 @@ Main._bindDrop = function() {
     });
 }
 
-Main.generateRandomTile = function () {
-    var tiles = Main._tileCategories;
-    var index = Math.floor(Math.random() * tiles.length);
 
-    return tiles[index];
-}
 
 //td_r_4_c_5
 Main.decomposeTdId = function(str) {
@@ -348,4 +343,11 @@ Main.highlightMatched = function (matched) {
         var id = "#td_r_" + i + "_c_" + matched.originCol;
         jQuery(id).addClass("highlighted");
     }
+}
+
+Main.clearTileEntity = function (row, col) {
+    Main.tileMap[row][col] = {
+        name: "empty",
+        icon: "empty"
+    };
 }
