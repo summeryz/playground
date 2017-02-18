@@ -62,6 +62,7 @@ Main._tileCategories = Main._defauleTileCategories;
 Main.mapWidth = 10;
 Main.mapHeight = 10;
 Main.tileMap = null;
+Main.removableTiles = null;
 
 Main.originTileId = null;
 Main.targetTileId = null;
@@ -101,6 +102,7 @@ Main.refreshMapDisplay = function(obj) {
         }
     }
 
+    Main.resetTileStatus();
 }
 
 Main._convertTileObjToDiv = function (tileObj) {
@@ -128,6 +130,8 @@ Main._bindDrop = function() {
 
         tdObj.droppable({
             drop: function (event, ui) {
+                Main.resetTileStatus();
+
                 Main.targetTileId = jQuery(this).attr('id');
                 // console_test(Main.originTileId);
                 // console_test(Main.targetTileId);
@@ -190,7 +194,7 @@ Main.validateTileSwap = function() {
     if (!Main._swapEliminable(Main.originTileId, Main.targetTileId)) {
         return false;
     }
-    // if (!Main._eliminable(tileObj) && !Main._eliminable(tileObj) ) {
+    // if (!Main._eliminated(tileObj) && !Main._eliminated(tileObj) ) {
     //     return false;
     // }
 
@@ -209,9 +213,9 @@ Main._swapEliminable = function(originTileId, targetTileId) {
 
     Main._swapTileEntity(originObj, targetObj);
 
-    if (Main._eliminable(targetPos.row, targetPos.col) || Main._eliminable(originPos.row, originPos.col)) {
+    if (Main._eliminated(targetPos.row, targetPos.col) || Main._eliminated(originPos.row, originPos.col)) {
         result = true;
-        Main._eliminable(originPos.row, originPos.col);//两个都可以的时候防止highlight被短路
+        Main._eliminated(originPos.row, originPos.col);//两个都可以的时候防止highlight被短路
     }
 
     Main._swapTileEntity(originObj, targetObj);
@@ -261,12 +265,15 @@ Main._swapTile = function (origin, target) {
  * @returns {boolean}
  * @private
  */
-Main._eliminable = function (row, col) {
+Main._eliminated = function (row, col) {
     // console_test([row, col]);
     var matched = Main._tileMatching(row, col);
     console_test(matched);
-    Main.highlightMatched(matched);
 
+    Main.highlightMatched(matched);
+    Main.processElimination();
+
+    Test.displayTileStatus();
     return matched.result;
 }
 
@@ -332,17 +339,50 @@ Main.highlightMatched = function (matched) {
         return;
     }
 
+    console_test("highlight matched");
+
+    if (Main.removableTiles == null) {
+        Main.removableTiles = new Array();
+    }
+
     //horizontal
     for (var i = matched.left; i <= matched.right; i++) {
         var id = "#td_r_" + matched.originRow + "_c_" + i;
         jQuery(id).addClass("highlighted");
+        Main.addRemovableTiles(matched.originRow, i);
     }
 
     //vertical
     for (var i = matched.top; i <= matched.bottom; i++) {
         var id = "#td_r_" + i + "_c_" + matched.originCol;
         jQuery(id).addClass("highlighted");
+        Main.addRemovableTiles(i, matched.originCol);
     }
+}
+
+Main.processElimination = function (matched) {
+    //update Main.removableTiles and process bonus, if need
+    Main.processBonus();
+
+    if (Main.removableTiles == null) {
+        return;
+    }
+
+    for (var i = 0; i < Main.removableTiles.length; i++) {
+        //drop down tiles over this tile
+        var temp = Main.removableTiles[i];
+        console_test(temp);
+        for (var j = 0; j < temp[0]; j++) {
+            Main.tileMap[j][temp[1]].moveDown--;
+        }
+    }
+
+    Main.resetRemovableTiles();
+}
+
+//update Main.removableTiles and process bonus
+Main.processBonus = function () {
+
 }
 
 Main.clearTileEntity = function (row, col) {
@@ -350,4 +390,34 @@ Main.clearTileEntity = function (row, col) {
         name: "empty",
         icon: "empty"
     };
+}
+
+Main.resetTileStatus = function() {
+    for (var i = 0; i < Main.mapHeight; i++) {
+        for (var j = 0; j < Main.mapWidth; j++) {
+            Main.tileMap[i][j].moveDown = 0;
+            Main.tileMap[i][j].removable = false;
+        }
+    }
+
+    Main.resetRemovableTiles();
+}
+
+Main.addRemovableTiles = function(row, col) {
+    var exist = false;
+    for (var i = 0; i < Main.removableTiles.length; i++) {
+        if (Main.removableTiles[i][0] == row && Main.removableTiles[i][1] == col) {
+            exist = true;
+            break;
+        }
+    }
+    if (!exist) {
+        Main.removableTiles.push([row, col]);
+        //set this tile removable
+        Main.tileMap[row][col].removable = true;
+    }
+}
+
+Main.resetRemovableTiles = function () {
+    Main.removableTiles = null;
 }

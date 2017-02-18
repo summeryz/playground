@@ -84,5 +84,5 @@ Init.randomTileGenerator = function () {
     var tiles = Main._tileCategories;
     var index = Math.floor(Math.random() * tiles.length);
 
-    return tiles[index];
+    return {name:tiles[index].name, icon:tiles[index].icon};
 }

@@ -5,6 +5,7 @@ jQuery.noConflict();
 
 var Test = Test || {}
 
+Test.enable = true;
 
 console_test = function (obj) {
     console.log(JSON.stringify(obj));
@@ -42,10 +43,30 @@ Init.TEST_initEmptyMap = function () {
 }
 
 
+// Test.displayElimination = function() {
+//     jQuery("#gameMap td").each(function () {
+//         var _self = this;
+//         //start test Main._eliminated
+//         jQuery(_self).on('click', function() {
+//             //only for test
+//             var type = jQuery(_self).children("div:first").attr("tile-type");
+//             var tdId = jQuery(_self).attr("id");
+//             var obj = Main.decomposeTdId(tdId);
+//             obj.type = type;
+//             obj.entityType = Main._getTileTypeByPos(obj.row, obj.col);
+//             console_test(obj);
+//             //only for test
+//
+//
+//             Main._eliminated(obj.row, obj.col);
+//         });
+//     });
+// }
+
 Test.displayElimination = function() {
     jQuery("#gameMap td").each(function () {
         var _self = this;
-        //start test Main._eliminable
+        //start test Main._eliminated
         jQuery(_self).on('click', function() {
             //only for test
             var type = jQuery(_self).children("div:first").attr("tile-type");
@@ -53,13 +74,25 @@ Test.displayElimination = function() {
             var obj = Main.decomposeTdId(tdId);
             obj.type = type;
             obj.entityType = Main._getTileTypeByPos(obj.row, obj.col);
-            console_test(obj);
+
             //only for test
-
-
-
-
-            Main._eliminable(obj.row, obj.col);
+            console_test(obj);
+            console_test(Main.tileMap[obj.row][obj.col]);
         });
     });
+}
+
+Test.displayTileStatus = function() {
+    if (!Test.enable) {
+        return;
+    }
+
+    for (var i = 0; i < Main.mapHeight; i++) {
+        for (var j = 0; j < Main.mapWidth; j++) {
+            var tdId = "#td_r_" + i + "_c_"+ j;
+            var moveDown = Main.tileMap[i][j].moveDown;
+            var removable = Main.tileMap[i][j].removable;
+            jQuery(tdId).children("div:first").html(moveDown);
+        }
+    }
 }
