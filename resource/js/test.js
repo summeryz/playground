@@ -12,7 +12,7 @@ console_test = function (obj) {
 }
 
 jQuery(window).ready(function () {
-    Init.setMapSize(6, 10);
+    Init.setMapSize(10, 15);
     Init.setTileCategories(3);
 
     // Init.TEST_initEmptyMap();
@@ -78,6 +78,7 @@ Test.displayElimination = function() {
             //only for test
             console_test(obj);
             console_test(Main.tileMap[obj.row][obj.col]);
+
         });
     });
 }

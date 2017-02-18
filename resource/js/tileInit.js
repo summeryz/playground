@@ -12,7 +12,7 @@ Init.setMapSize = function (width, height) {
         return;
     }
 
-    if (typeof height == "undefined" || height < 3 || height > 10) {
+    if (typeof height == "undefined" || height < 3 || height > 15) {
         return;
     }
 
@@ -20,10 +20,10 @@ Init.setMapSize = function (width, height) {
     Main.mapHeight = height;
 }
 
-//设置有几种花色,最少三种
+//设置有几种花色,最少2种
 Init.setTileCategories = function (count) {
     var defaultCategories = Main._defauleTileCategories;
-    if (typeof count == "undefined" || count < 3 || count > defaultCategories.length) {
+    if (typeof count == "undefined" || count < 2 || count > defaultCategories.length) {
         count = defaultCategories.length;
     }
 
@@ -37,10 +37,7 @@ Init._initEmptyMap = function () {
     for (var i = 0; i < Main.mapHeight; i++) {
         Main.tileMap[i] = new Array();
         for (var j = 0; j < Main.mapWidth; j++) {
-            Main.tileMap[i][j] = {
-                    name: "empty",
-                    icon: "empty"
-                };
+            Main.tileMap[i][j] = Main.generateEmptyTile();
         }
     }
 
@@ -62,7 +59,7 @@ Init.initStartMap = function() {
 
 //
 Init.initTileGenerator = function (row, col) {
-    var test = 100;
+    var test = 200;
 
     while (Main.tileMap[row][col].name == "empty") {
         if (test-- < 0) {

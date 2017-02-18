@@ -98,6 +98,7 @@ Main.refreshMapDisplay = function(obj) {
     for (var row = 0; row < Main.tileMap.length; row++) {
         for (var col = 0; col < Main.tileMap[0].length; col++) {
             var tdId = "#td_r_" + row + "_c_" + col;
+            jQuery(tdId).empty();
             Main._convertTileObjToDiv(Main.tileMap[row][col]).appendTo(jQuery(tdId));
         }
     }
@@ -140,7 +141,7 @@ Main._bindDrop = function() {
                 if (!Main.validateTileSwap()) {
                     return;
                 }
-
+// throw new Error('asd');
 
                 var originTile = jQuery("#" + Main.originTileId + " div");
                 var targetTile = jQuery("#" + Main.targetTileId + " div");
@@ -149,6 +150,10 @@ Main._bindDrop = function() {
                 Main._swapTile(originTile, targetTile);
                 Main.originTileId = null;
                 Main.targetTileId = null;
+
+                Main.processElimination();
+
+                Main.fadeOutMatched();
             }
         });
     });
@@ -230,7 +235,6 @@ Main._swapTileDisplay = function (origin, target) {
 
     origin.removeClass(originType).addClass(targetType).attr("tile-type", targetType);
     target.removeClass(targetType).addClass(originType).attr("tile-type", originType);
-
 }
 
 Main._swapTileEntity = function (origin, target) {
@@ -271,9 +275,11 @@ Main._eliminated = function (row, col) {
     console_test(matched);
 
     Main.highlightMatched(matched);
-    Main.processElimination();
+
+
 
     Test.displayTileStatus();
+
     return matched.result;
 }
 
@@ -347,37 +353,31 @@ Main.highlightMatched = function (matched) {
 
     //horizontal
     for (var i = matched.left; i <= matched.right; i++) {
-        var id = "#td_r_" + matched.originRow + "_c_" + i;
-        jQuery(id).addClass("highlighted");
         Main.addRemovableTiles(matched.originRow, i);
     }
 
     //vertical
     for (var i = matched.top; i <= matched.bottom; i++) {
-        var id = "#td_r_" + i + "_c_" + matched.originCol;
-        jQuery(id).addClass("highlighted");
         Main.addRemovableTiles(i, matched.originCol);
     }
 }
 
 Main.processElimination = function (matched) {
     //update Main.removableTiles and process bonus, if need
-    Main.processBonus();
-
     if (Main.removableTiles == null) {
         return;
     }
 
-    for (var i = 0; i < Main.removableTiles.length; i++) {
-        //drop down tiles over this tile
-        var temp = Main.removableTiles[i];
-        console_test(temp);
-        for (var j = 0; j < temp[0]; j++) {
-            Main.tileMap[j][temp[1]].moveDown--;
-        }
-    }
+    Main.processBonus();
+
+    Main.calcMoveDown();
+
+    Main.processMoveDown();
+
+    Main.fillEmptyTiles();
 
     Main.resetRemovableTiles();
+
 }
 
 //update Main.removableTiles and process bonus
@@ -385,11 +385,49 @@ Main.processBonus = function () {
 
 }
 
-Main.clearTileEntity = function (row, col) {
-    Main.tileMap[row][col] = {
+Main.calcMoveDown = function() {
+    for (var i = 0; i < Main.removableTiles.length; i++) {
+        //drop down tiles over this tile
+        var temp = Main.removableTiles[i];
+        console_test(temp);
+        for (var j = 0; j < temp[0]; j++) {
+            Main.tileMap[j][temp[1]].moveDown++;
+        }
+
+
+        var id = "#td_r_" + temp[0] + "_c_" + temp[1];
+        jQuery(id).addClass("highlighted");
+    }
+}
+
+Main.processMoveDown = function() {
+    for (var row = Main.mapHeight - 1; row >=0; row--) {
+        for (var col = Main.mapWidth - 1; col >= 0; col--) {
+            if (!Main.tileMap[row][col].removable && Main.tileMap[row][col].moveDown != 0) {
+                var downStep = Main.tileMap[row][col].moveDown;
+                Main.tileMap[row + downStep][col] = Main.tileMap[row][col];
+                Main.tileMap[row][col] = null;
+                Main.tileMap[row][col] = Main.generateEmptyTile();
+            }
+        }
+    }
+
+}
+
+Main.fillEmptyTiles = function() {
+
+}
+
+Main.generateEmptyTile = function() {
+    return {
         name: "empty",
-        icon: "empty"
+        icon: "empty",
+        moveDown: 0,
+        removable: false
     };
+}
+Main.clearTileEntity = function (row, col) {
+    Main.tileMap[row][col] = Main.generateEmptyTile();
 }
 
 Main.resetTileStatus = function() {
@@ -420,4 +458,20 @@ Main.addRemovableTiles = function(row, col) {
 
 Main.resetRemovableTiles = function () {
     Main.removableTiles = null;
+}
+
+Main.fadeOutMatched = function () {
+    var refreshed = false;
+
+    jQuery(".highlighted").each(function() {
+        var _self = this;
+        jQuery(_self).children("div:first").fadeOut(2000, function() {
+            jQuery(_self).removeClass("highlighted");
+            if (!refreshed) {
+                Main.refreshMapDisplay(Main.tileMap);
+                refreshed = true;
+            }
+        });
+    });
+
 }
