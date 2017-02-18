@@ -73,8 +73,8 @@ Init.initTileGenerator = function (row, col) {
 
         //初始不能有 已经可消除的块
         if (Main._tileMatching(row, col).result) {
-            console_test([row, col]);
-            console_test(Main.tileMap[row][col]);
+            // console_test([row, col]);
+            // console_test(Main.tileMap[row][col]);
             Main.clearTileEntity(row, col);
         }
     }
