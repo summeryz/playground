@@ -1,6 +1,11 @@
 /**
  * Created by tianxia on 2/16/17.
  */
+jQuery.noConflict();
+
+var Test = Test || {}
+
+
 console_test = function (obj) {
     console.log(JSON.stringify(obj));
 }
@@ -11,6 +16,7 @@ jQuery(window).ready(function () {
     Init.TEST_initEmptyMap();
 
     console_test(Main._tileCategories);
+    Test.displayElimination();
 });
 
 
@@ -32,3 +38,18 @@ Init.TEST_initEmptyMap = function () {
     Main._buildEmptyMapDisplay();
 }
 
+
+Test.displayElimination = function() {
+    jQuery("#gameMap td").each(function () {
+        var _self = this;
+        //start test Main._eliminable
+        jQuery(_self).on('click', function() {
+            var type = jQuery(_self).children("div:first").attr("tile-type");
+            var tdId = jQuery(_self).attr("id");
+            var obj = Main.decomposeTdId(tdId);
+            obj.type = type;
+
+            Main._eliminable(obj);
+        });
+    });
+}

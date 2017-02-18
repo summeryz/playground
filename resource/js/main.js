@@ -131,7 +131,7 @@ Main._bindDrop = function() {
                 var targetTile = jQuery("#" + Main.targetTile + " div");
 
 
-                Main._swapTileDisplay(originTile, targetTile);
+                Main._swapTile(originTile, targetTile);
                 Main.originTile = null;
                 Main.targetTile = null;
             }
@@ -149,7 +149,7 @@ Main.generateRandomTile = function () {
 //td_r_4_c_5
 Main.decomposeTdId = function(str) {
     res = str.split('_');
-    return {row: res[2], col: res[4]};
+    return {row: parseInt(res[2]), col: parseInt(res[4])};
 }
 
 Main.validateTileSwap = function() {
@@ -176,9 +176,10 @@ Main.validateTileSwap = function() {
     }
 
     //是否能消除
-    if (!Main._eliminable()) {
-        return false;
-    }
+
+    // if (!Main._eliminable(tileObj)) {
+    //     return false;
+    // }
 
     return true;
 }
@@ -194,11 +195,109 @@ Main._swapTileDisplay = function (origin, target) {
 }
 
 Main._swapTileEntity = function (origin, target) {
+    var originPos = Main.decomposeTdId(jQuery(origin).parent().attr('id'));
+    var targetPos = Main.decomposeTdId(jQuery(target).parent().attr('id'));
+    //
+    // console_test("origin" + JSON.stringify(originPos) + JSON.stringify(Main.tileMap[originPos.row][originPos.col]));
+    // console_test("target" + JSON.stringify(targetPos) + JSON.stringify(Main.tileMap[targetPos.row][targetPos.col]));
+    var tempTile = Main.tileMap[targetPos.row][targetPos.col];
+    Main.tileMap[targetPos.row][targetPos.col] = Main.tileMap[originPos.row][originPos.col];
+    Main.tileMap[originPos.row][originPos.col] = tempTile;
 
 
+    // console_test(" " + JSON.stringify(originPos) + JSON.stringify(Main.tileMap[originPos.row][originPos.col]));
+    // console_test(" " + JSON.stringify(targetPos) + JSON.stringify(Main.tileMap[targetPos.row][targetPos.col]));
 }
 
-Main._eliminable = function () {
-    return true;
+Main._swapTile = function (origin, target) {
+    Main._swapTileDisplay(origin, target);
+    Main._swapTileEntity(origin, target);
 }
 
+
+/****************************************************/
+/**
+ * 消除规则
+ * 1. 直线3连即消除，大于等于5连，消除所在行／列
+ * 2. 十字相连总数大于等于5连，消除交叉点所在行和列
+ * 3. 以后再扩充
+ *
+ * @param {row:0, col:0, type:"round"}
+ * @returns {boolean}
+ * @private
+ */
+Main._eliminable = function (tileObj) {
+    var matched = Main._tileMatching(tileObj);
+    console_test(matched);
+    Main.highlightMatched(matched);
+
+    return matched.result;
+}
+
+// Main._getTileTypeByPos = function(row, col) {
+//     var res =  jQuery("#td_r_" + row + "_c_" + col).children("div:first").attr("tile-type");
+//     console_test(res);
+//     return res;
+// }
+
+Main._getTileTypeByPos = function(row, col) {
+    console_test([row, col, Main.tileMap[row][col].name]);
+    return Main.tileMap[row][col].name;
+}
+
+//基于一个前提，如果是十字消失，拖动的那个tile一定是中轴
+Main._tileMatching = function (tileObj) {
+    var row = tileObj.row;
+    var col = tileObj.col;
+    var type = tileObj.type;
+
+    var result = false;
+    var top = row;
+    var right = col;
+    var bottom = row;
+    var left = col;
+
+    //top
+    while (top > 0 && Main._getTileTypeByPos(top - 1, col) == type) {
+        top--;
+    }
+
+    //right
+    while (right + 1 < Main.mapWidth && Main._getTileTypeByPos(row, right + 1) == type) {
+        right++;
+    }
+
+    //bottom
+    while ((bottom + 1 < Main.mapHeight) && Main._getTileTypeByPos(bottom + 1, col) == type) {
+        bottom++;
+    }
+
+    //left
+    while (left > 0 && Main._getTileTypeByPos(row, left - 1) == type) {
+        left--;
+    }
+
+    if (top - bottom >= 3 || right - left >= 3) {
+        result = true;
+    }
+
+    return {result: result, top:top, right:right, bottom:bottom, left:left, originRow: row, originCol: col};
+}
+
+Main.highlightMatched = function (matched) {
+    if (!matched.result) {
+        // return;
+    }
+
+    //horizontal
+    for (var i = matched.left; i <= matched.right; i++) {
+        var id = "#td_r_" + matched.originRow + "_c_" + i;
+        jQuery(id).addClass("highlighted");
+    }
+
+    //vertical
+    for (var i = matched.top; i <= matched.bottom; i++) {
+        var id = "#td_r_" + i + "_c_" + matched.originCol;
+        jQuery(id).addClass("highlighted");
+    }
+}
