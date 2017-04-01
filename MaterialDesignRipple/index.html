@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .enable-ripple{
+            position:relative;
+            cursor:pointer;
+            display:inline-block;
+            overflow:hidden;
+            text-align: center;
+            -webkit-tap-highlight-color:transparent;
+            z-index:1;
+        }
+        .ts-btn{
+            width: 200px;
+            height: 56px;
+            line-height: 56px;
+            background: #f57035;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        .enable-ripple .test {
+            position:absolute;
+            left: 10px;
+            top: 10px;
+            border-radius:50%;
+            width:25px;
+            height:25px;
+            /*opacity:100;*/
+            background:rgba(255,255,255,0.3);
+        }
+    </style>
+    <!--脚本加载-->
+    <script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+</head>
+<body>
+<a class="enable-ripple ts-btn">Press me!</a>
+<botton class="enable-ripple ts-btn">Press me!</botton>
+</body>
+</html>
+
+
+<script>
+    jQuery(function() {
+        var ripple = new Ripple(".enable-ripple", 10000);
+        ripple.enable();
+    });
+
+
+    var Ripple = function(target, duration) {
+        this.duration = 500;
+        this.ratio = 1.1; //div为所需大小的1.1倍，确保边角被完全覆盖
+        this.opacity = 0.8;
+        this.target = ".enable-ripple";
+        this.interval = 20; //20 ms
+        this.saturate = 2;
+
+
+        if (typeof target != "undefined") {
+            this.target = target;
+        }
+
+        if (typeof duration != "undefined") {
+            this.duration = duration;
+        }
+    }
+
+    Ripple.prototype={
+        enable : function() {
+            this.bind();
+        },
+
+        bind : function(){
+            var clazz = this;
+            var saturate = clazz.saturate;
+
+            jQuery(clazz.target).each(function(index, obj) {
+                var obj = jQuery(obj);
+
+                obj.css({"overflow": "relative"});
+
+                obj.unbind('hover').hover(function () {
+                    jQuery(this).css({
+                        "-webkit-filter": "saturate("+saturate+")",
+                        "-moz-filter": "saturate("+saturate+")",
+                        "-o-filter": "saturate("+saturate+")",
+                        "-ms-filter": "saturate("+saturate+")",
+                        "filter": "saturate("+saturate+")",
+                    });
+                }, function () {
+                    jQuery(this).css({
+                        "-webkit-filter": "saturate(1)",
+                        "-moz-filter": "saturate(1)",
+                        "-o-filter": "saturate(1)",
+                        "-ms-filter": "saturate(1)",
+                        "filter": "saturate(1)",
+                    });
+                });
+
+                obj.unbind('click').bind('click', function(e) {
+                    clazz.play(e, obj);
+                });
+            });
+        },
+
+        play : function (e, obj) {
+            if (typeof obj == 'undefined') {
+                console.error('cannot play ripple');
+                return;
+            }
+
+            var clazz = this;
+
+            var originalPos = clazz.getOriginalPos(e, obj);
+
+            var radius = clazz.getRadius(obj, originalPos);
+
+            clazz.transformation(originalPos, radius, obj);
+        },
+
+        //get position of mouse pointer（relative to clicked obj）
+        getOriginalPos : function(e, obj) {
+            var res = {"x": 0, "y":0};
+
+            if (typeof e == 'undefined') {
+                console.error('wrong event, cannot play ripple');
+                return res;
+            }
+
+            res.x = e.pageX - obj.offset().left;
+            res.y = e.pageY - obj.offset().top;
+
+            return res;
+        },
+
+        //get the distance from farthest vertex to mouse pointer, then times Ripple.ratio
+        getRadius : function(obj, originalPos) {
+            if (typeof obj == 'undefined' || typeof originalPos == 'undefined' ) {
+                console.error('wrong obj, cannot play ripple');
+                return 0;
+            }
+
+            var width = obj.outerWidth();
+            var height = obj.outerHeight();
+
+            var x = originalPos.x > (width / 2) ? originalPos.x : (width - originalPos.x);
+            var y = originalPos.y > (height / 2) ? originalPos.y : (height - originalPos.y);
+
+            x = Math.pow(x, 2);
+            y = Math.pow(y, 2);
+
+            return Math.round(Math.sqrt(x + y) * this.ratio);
+        },
+
+        transformation : function(originalPos, radius, target) {
+            if (typeof originalPos == 'undefined' || typeof radius == 'undefined' || typeof target == 'undefined') {
+                console.error('wrong obj, cannot play transformation');
+            }
+
+            var opacity = this.opacity;
+            var duration = this.duration;
+            var interval  = this.interval;
+            var steps = duration / interval;
+
+            var rippleDiv = jQuery('<div></div>');
+            rippleDiv.css({
+                "position": "absolute",
+                "left": originalPos.x,
+                "top": originalPos.y,
+                "border-radius": "50%",
+                "height": 0,
+                "width": 0,
+                "background-color" : "#fff",
+                "opacity": opacity,
+            });
+
+            //add div inside target
+            target.append(rippleDiv);
+
+            var pace = Math.round(radius / steps);
+            pace = pace < 1 ? 1 : pace;
+            steps = radius / pace;
+            interval = Math.floor(duration / steps);
+
+            var pace = pace * 2; //宽高每次变大两倍
+            var opacityPace = opacity / steps;
+
+            var intervalId = setInterval(function () {
+                var w = rippleDiv.outerWidth() + pace;
+                var h = rippleDiv.outerHeight() + pace;
+                var posX = rippleDiv.position().left - pace;
+                var posY = rippleDiv.position().top - pace;
+                var op = rippleDiv.css("opacity") - opacityPace;
+
+                rippleDiv.css({
+                    "width": w + pace,
+                    "height": h + pace,
+                    "left": posX,
+                    "top": posY,
+                    "opacity": op <= 0 ? 0 : op,
+                });
+
+            }, interval);
+
+            setTimeout(function () {
+                clearInterval(intervalId);
+                rippleDiv.remove();
+            }, duration);
+        }
+
+    }
+
+
+
+</script>
