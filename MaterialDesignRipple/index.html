@@ -5,12 +5,8 @@
     <title>Title</title>
     <style>
         .enable-ripple{
-            position:relative;
-            cursor:pointer;
-            display:inline-block;
-            overflow:hidden;
             text-align: center;
-            -webkit-tap-highlight-color:transparent;
+            /*-webkit-tap-highlight-color:transparent;*/
             z-index:1;
         }
         .ts-btn{
@@ -20,17 +16,6 @@
             background: #f57035;
             color: #fff;
             border-radius: 5px;
-        }
-
-        .enable-ripple .test {
-            position:absolute;
-            left: 10px;
-            top: 10px;
-            border-radius:50%;
-            width:25px;
-            height:25px;
-            /*opacity:100;*/
-            background:rgba(255,255,255,0.3);
         }
     </style>
     <!--脚本加载-->
@@ -45,18 +30,20 @@
 
 <script>
     jQuery(function() {
-        var ripple = new Ripple(".enable-ripple", 10000);
+        var ripple = new Ripple(".enable-ripple", 1000);
         ripple.enable();
     });
 
 
     var Ripple = function(target, duration) {
         this.duration = 500;
-        this.ratio = 1.1; //div为所需大小的1.1倍，确保边角被完全覆盖
-        this.opacity = 0.8;
+        this.ratio = 1.1; //div为所需大小的1.1倍，确保边角被完全覆盖，已经足够了，不要设置太大
+        this.opacity = 0.25;
         this.target = ".enable-ripple";
         this.interval = 20; //20 ms
         this.saturate = 2;
+        this.repeat = 3;
+        this.repearInterval = this.duration / 5;
 
 
         if (typeof target != "undefined") {
@@ -80,7 +67,12 @@
             jQuery(clazz.target).each(function(index, obj) {
                 var obj = jQuery(obj);
 
-                obj.css({"overflow": "relative"});
+                obj.css({
+                    "overflow" : "hidden",
+                    "position" : "relative",
+                    "cursor" : "pointer",
+                    "display" : "inline-block"
+                });
 
                 obj.unbind('hover').hover(function () {
                     jQuery(this).css({
@@ -118,7 +110,14 @@
 
             var radius = clazz.getRadius(obj, originalPos);
 
-            clazz.transformation(originalPos, radius, obj);
+            var repeat = clazz.repeat;
+            var intervalId = setInterval(function () {
+                if (repeat-- == 1) {
+                    clearInterval(intervalId);
+                }
+
+                clazz.transformation(originalPos, radius, obj)
+            }, clazz.repearInterval);
         },
 
         //get position of mouse pointer（relative to clicked obj）
@@ -160,9 +159,10 @@
                 console.error('wrong obj, cannot play transformation');
             }
 
-            var opacity = this.opacity;
-            var duration = this.duration;
-            var interval  = this.interval;
+            var clazz = this;
+            var opacity = clazz.opacity;
+            var duration = clazz.duration;
+            var interval  = clazz.interval;
             var steps = duration / interval;
 
             var rippleDiv = jQuery('<div></div>');
@@ -185,25 +185,31 @@
             steps = radius / pace;
             interval = Math.floor(duration / steps);
 
+            var offset = pace;
             var pace = pace * 2; //宽高每次变大两倍
             var opacityPace = opacity / steps;
 
             var intervalId = setInterval(function () {
                 var w = rippleDiv.outerWidth() + pace;
                 var h = rippleDiv.outerHeight() + pace;
-                var posX = rippleDiv.position().left - pace;
-                var posY = rippleDiv.position().top - pace;
+                var posX = rippleDiv.position().left - offset;
+                var posY = rippleDiv.position().top - offset;
                 var op = rippleDiv.css("opacity") - opacityPace;
 
                 rippleDiv.css({
-                    "width": w + pace,
-                    "height": h + pace,
+                    "width": w,
+                    "height": h,
                     "left": posX,
                     "top": posY,
                     "opacity": op <= 0 ? 0 : op,
                 });
 
             }, interval);
+
+//            console.log(radius);
+//            console.log(pace);
+//            console.log(interval);
+//            console.log(duration);
 
             setTimeout(function () {
                 clearInterval(intervalId);
